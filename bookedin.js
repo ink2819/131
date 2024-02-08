@@ -1,5 +1,7 @@
 const express = require('express')
 var handlebars = require('express-handlebars').create();
+const bodyParser = require('body-parser')
+
 const indexRouter = require('./routes/index');
 const authorsRouter = require('./routes/authors');
 const booksRouter = require('./routes/books');
@@ -10,6 +12,8 @@ const port = 3000
 
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 /* GET home page. */
 app.use('/', indexRouter);
