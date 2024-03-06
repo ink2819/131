@@ -7,7 +7,7 @@ const genres = [
   exports.all = genres
 
   exports.add = (genre) => {
-    genre.push(genre);
+    genres.push(genre);
   };
   
   exports.get = (idx) => {

@@ -1,4 +1,6 @@
 <form action="/genres/upsert" role="form" method="post">
+<input type="hidden" name="_csrf" value="{{_csrfToken}}">
+
   <h1>New Genre</h1>
   {{#if genre}}
   <div>
@@ -9,4 +11,5 @@
   <div>
     <label>Genre Name</label>
     <input type="text" id="name" name="name" {{#if genre}}value="{{genre.name}}"{{/if}}>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
