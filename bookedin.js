@@ -1,4 +1,41 @@
 const express = require('express')
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const expressSession = require('express-session')
+const csrf = require('csurf')
+
+const { credentials } = require('./config')
+
+const indexRouter = require('./routes/index');
+const authorsRouter = require('./routes/authors');
+const booksRouter = require('./routes/books');
+const usersRouter = require('./routes/users');
+const genresRouter = require('./routes/genres');
+const booksUsersRouter = require('./routes/books_users');
+const commentsRouter = require('./routes/comments');
+
+const app = express()
+const port = 3000
+
+//extra platform setup
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser(credentials.cookieSecret));
+app.use(expressSession({
+  secret: credentials.cookieSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
+}));
+
+// this must come after we link in body-parser,
+// cookie-parser, and express-session
+app.use(csrf({ cookie: true }))
+app.use((req, res, next) => {
+  res.locals._csrfToken = req.csrfToken()
+  next()
+})
+
+// view engine setup
 var handlebars = require('express-handlebars').create({
   helpers: {
     eq: (v1, v2) => v1 == v2,
@@ -18,63 +55,37 @@ var handlebars = require('express-handlebars').create({
     dateStr: (v) => v && v.toLocaleDateString("en-US")
   }
 });
-
-const bodyParser = require('body-parser');
-const { credentials } = require('./config');
-const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
-const csrf = require('csurf');
-
-const indexRouter = require('./routes/index');
-const authorsRouter = require('./routes/authors');
-const booksRouter = require('./routes/books');
-const genresRouter = require('./routes/genres');
-const usersRouter = require('./routes/users');
-const booksUsersRouter = require('./routes/books_users');
-
-
-const app = express()
-const port = 3000
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser(credentials.cookieSecret));
-app.use(expressSession({
-  secret: credentials.cookieSecret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
-}));
+
+// session configuration
+//make it possible to use flash messages, and pass them to the view
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash
   delete req.session.flash
   next()
-});
+})
+//make the current user available in views
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.currentUser
   next()
 })
 
-app.use(csrf({ cookie: true }))
-app.use((req, res, next) => {
-  res.locals._csrfToken = req.csrfToken()
-  next()
-})
-
-/* GET home page. */
+// routes
 app.use('/', indexRouter);
 app.use('/authors', authorsRouter);
 app.use('/books', booksRouter);
-app.use('/genres', genresRouter);
 app.use('/users', usersRouter);
+app.use('/genres', genresRouter);
 app.use('/books_users', booksUsersRouter);
+app.use('/comments', commentsRouter);
 
-  
 // custom 404 page
 app.use((req, res) => {
   res.status(404)
   res.send('<h1>404 - Not Found</h1>')
 })
+
 // custom 500 page
 app.use((err, req, res, next) => {
   console.error(err.message)
@@ -82,6 +93,7 @@ app.use((err, req, res, next) => {
   res.status(500)
   res.send('500 - Server Error')
 })
+
 app.listen(port, () => console.log(
 `Express started on http://localhost:${port}; ` +
 `press Ctrl-C to terminate.`))

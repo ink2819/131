@@ -5,7 +5,7 @@
    {{#if book}}
   <div>
     <h2>Editing: {{book.title}} {{book.publishingYear}}</h2>
-    <input type="hidden" name="id" value="{{bookIndex}}">
+    <input type="hidden" name="id" value="{{book.id}}">
   </div>
   {{/if}}
   <div>
@@ -17,11 +17,11 @@
     <input type="text" id="publishing_year" name="publishingYear" {{#if book}}value="{{book.publishingYear}}"{{/if}}>
   </div>
   <div class="mb-3">
-    <label for="authorId">Author</label>
-    <select name="authorId" id="authorId">
-      <option disabled selected value>-- select Author --</option>
+    <label for="authorIds">Author</label>
+    <select multiple name="authorIds" id="authorIds">
+      <option disabled value>-- select Author --</option>
       {{#each authors}}
-        <option value="{{@index}}" {{#if (and @root.book (eq @root.book.authorId @index))}}selected{{/if}}>
+        <option value="{{this.id}}" {{#if (and @root.book (in @root.book.authorIds this.id))}}selected{{/if}}>
           {{this.firstName}} {{this.lastName}}
         </option>
       {{/each}}
@@ -32,7 +32,7 @@
     <select name="genreId" id="genreId">
       <option disabled selected value>-- select Genre --</option>
       {{#each genres}}
-        <option value="{{@index}}" {{#if (and @root.book (eq @root.book.genreId @index))}}selected{{/if}}>
+        <option value="{{this.id}}" {{#if (and @root.book (eq @root.book.genreId this.id))}}selected{{/if}}>
           {{this.name}}
         </option>
       {{/each}}
