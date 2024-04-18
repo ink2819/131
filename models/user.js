@@ -4,8 +4,8 @@ const users = [
     {
         email: 'flong@pratt.edu',
         name: 'FL',
-        salt: '0f36d24a0c8bb66c74b4d64d2c30bc86',
-        encryptedPassword: '9ba0f1f74b5213849058ccfc0ed0fad08e73ad874b010bad28eb748b0c13190d'
+        salt: 'f70856f4ef87d64156c801c634e0dd1e',
+        encryptedPassword: '97b11ef74169bff49f64b3569a3c4d541599035ffebd33b75f8b2f15f86d31e4'
       }
   ];
   exports.add = (user) => {
